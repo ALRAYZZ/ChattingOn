@@ -1,0 +1,14 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+  "dependencies": [
+    "boost-asio",
+    "portaudio",
+    "opus",
+    "spdlog",
+    "fmt",
+    "nlohmann-json",
+    "gtest"
+  ],
+  "overrides": [],
+  "builtin-baseline": "b6649256091aa433d6d7a912eb5f2c7725a0c040"
+}
