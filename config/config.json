@@ -1,12 +1,8 @@
 {
-  "server": {
-    "control_port": 7000,
-    "audio_port": 7001,
-    "address": "127.0.0.1"
-  },
-  "audio": {
-    "sample_rate": 48000,
-    "channels": 1,
-    "frame_size_ms": 20
-  }
+  "serverAddress": "127.0.0.1",
+  "controlPort": 7000,
+  "audioPort": 7001,
+  "sampleRate": 48000,
+  "channels": 1,
+  "frameSizeMs": 20
 }

@@ -24,6 +24,6 @@ namespace ChattingOn
 		boost::asio::io_context& ioContext;
 		boost::asio::ip::tcp::socket socket;
 		MessageHandler messageHandler;
-		std::array<char, 1024> readBuffer;
+		boost::asio::streambuf receiveBuffer;
 	};
 }

@@ -44,6 +44,22 @@ add_executable(server
 )
 target_link_libraries(server PRIVATE common)
 
+# Set server output directory and copy config file
+set_target_properties(server PROPERTIES
+	RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/server"
+	RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}/server"
+	RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/server"
+)
+
+# Copy config file for server
+add_custom_command(TARGET server POST_BUILD
+	COMMAND ${CMAKE_COMMAND} -E copy_directory
+	"${CMAKE_SOURCE_DIR}/config"
+	"${CMAKE_BINARY_DIR}/server/config"
+	COMMENT "Copying config file to server output directory"
+)
+
+
 # Client executable
 add_executable(client
 	src/client/main.cpp
@@ -52,6 +68,22 @@ add_executable(client
 	src/client/udp_client.cpp
 )
 target_link_libraries(client PRIVATE common)
+
+# Set client output directory
+set_target_properties(client PROPERTIES
+	RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/client"
+	RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}/client"
+	RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/client"
+)
+
+# Copy config file for client
+add_custom_command(TARGET client POST_BUILD
+	COMMAND ${CMAKE_COMMAND} -E copy_directory
+	"${CMAKE_SOURCE_DIR}/config"
+	"${CMAKE_BINARY_DIR}/client/config"
+	COMMENT "Copying config file to client output directory"
+)
+
 
 # Tests
 enable_testing()
