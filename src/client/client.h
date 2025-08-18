@@ -13,6 +13,7 @@ namespace ChattingOn
 		Client(boost::asio::io_context& ioContext, const Config& config);
 		void Start();
 		void JoinRoom(const std::string& clientId, const std::string& roomId);
+		void SendTestAudioPacket(const std::string& clientId, const std::string& roomId);
 
 	private:
 		void HandleControlMessage(const ControlMessage& msg);
@@ -22,5 +23,6 @@ namespace ChattingOn
 		Config config;
 		TcpClient tcpClient;
 		UdpClient udpClient;
+		boost::asio::ip::udp::endpoint serverEndpoint;
 	};
 }

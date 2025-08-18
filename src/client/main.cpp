@@ -10,6 +10,9 @@ int main()
 		ChattingOn::Client client(ioContext, config);
 		client.Start();
 		client.JoinRoom("client1", "room1");
+		// Send a test audio packet
+		std::this_thread::sleep_for(std::chrono::seconds(1)); // Wait for connection to establish
+		client.SendTestAudioPacket("client1", "room1");
 		ioContext.run();
 	}
 	catch (const std::exception& ex)

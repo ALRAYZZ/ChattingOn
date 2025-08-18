@@ -22,6 +22,7 @@ add_library(common STATIC
 	src/common/audio_utils.cpp
 	src/common/network_utils.cpp
 	src/common/control_message.cpp
+	src/common/audio_packet.cpp
 	#### ADD MORE
 )
 

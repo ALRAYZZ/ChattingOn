@@ -13,6 +13,7 @@ namespace ChattingOn
 
 		UdpServer(boost::asio::io_context& ioContext, uint16_t port, PacketHandler handler);
 		void Start();
+		void SendPacket(const std::vector<char>& packet, const boost::asio::ip::udp::endpoint& destEndpoint);
 
 	private:
 		void StartReceive();

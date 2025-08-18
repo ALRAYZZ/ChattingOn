@@ -1,5 +1,6 @@
 #include "client.h"
 #include <spdlog/spdlog.h>
+#include "audio_packet.h"
 
 namespace ChattingOn
 {
@@ -22,6 +23,14 @@ namespace ChattingOn
 		ControlMessage msg(ControlMessage::Type::JOIN_ROOM, clientId, roomId);
 		tcpClient.SendControlMessage(msg);
 	}
+	
+	void Client::SendTestAudioPacket(const std::string& clientId, const std::string& roomId)
+	{
+		AudioPacket packet(clientId, roomId, std::vector<char>(960 * 2, 0)); // 20 ms 48kHz stereo audio, PCM16
+		auto data = packet.Serialize();
+		udpClient.SendPacket(data, serverEndpoint);
+		spdlog::info("Sent test audio packet to room {}", roomId);
+	}
 
 	void Client::HandleControlMessage(const ControlMessage& msg)
 	{
@@ -30,7 +39,14 @@ namespace ChattingOn
 
 	void Client::HandleUdpPacket(const std::vector<char>& data)
 	{
-		spdlog::info("Received UDP packet of size {}", data.size());
-		// Process audio data here
+		try
+		{
+			auto packet = AudioPacket::Deserialize(data);
+			spdlog::info("Received audio packet from {} for room {}", packet.clientId, packet.roomId);
+		}
+		catch (const std::exception& ex)
+		{
+			spdlog::error("UDP packet error: {}", ex.what());
+		}
 	}
 }

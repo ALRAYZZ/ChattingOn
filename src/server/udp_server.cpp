@@ -13,6 +13,18 @@ namespace ChattingOn
 		StartReceive();
 	}
 
+	void UdpServer::SendPacket(const std::vector<char>& packet, const boost::asio::ip::udp::endpoint& destEndpoint)
+	{
+		socket.async_send_to(boost::asio::buffer(packet), destEndpoint,
+			[](const boost::system::error_code& error, std::size_t /*bytes*/)
+			{
+				if (error)
+				{
+					spdlog::error("UDP send error: {}", error.message());
+				}
+			});
+	}
+
 	void UdpServer::StartReceive()
 	{ 
 		socket.async_receive_from(boost::asio::buffer(receiveBuffer), senderEndpoint,

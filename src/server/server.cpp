@@ -1,5 +1,6 @@
 #include "server.h"
 #include <spdlog/spdlog.h>
+#include "audio_packet.h"
 
 namespace ChattingOn
 {
@@ -9,9 +10,9 @@ namespace ChattingOn
 			{
 				HandleControlMessage(msg, clientId);
 			}),
-		udpServer(ioContext,config.audioPort, [this](const std::vector<char>& data, const boost::asio::ip::udp::endpoint& senderEndpoint)
+		udpServer(ioContext,config.audioPort, [this](const std::vector<char>& packet, const boost::asio::ip::udp::endpoint& senderEndpoint)
 			{
-				HandleUdpPacket(data, senderEndpoint);
+				HandleUdpPacket(packet, senderEndpoint);
 			}) {}
 
 	void Server::Start()
@@ -26,7 +27,7 @@ namespace ChattingOn
 		switch (msg.GetType())
 		{
 			case ControlMessage::Type::JOIN_ROOM:
-				roomManager.AddClientToRoom(clientId, msg.GetRoomId());
+				roomManager.AddClientToRoom(clientId, msg.GetRoomId(), clientEndpoints[clientId]);
 				spdlog::info("Client {} joined room {}", clientId, msg.GetRoomId());
 				break;
 				
@@ -43,7 +44,20 @@ namespace ChattingOn
 
 	void Server::HandleUdpPacket(const std::vector<char>& data, const boost::asio::ip::udp::endpoint& senderEndpoint)
 	{
-		spdlog::info("Received UDP packet from {}", senderEndpoint.address().to_string());
-		// Forward to room clients
+		try
+		{
+			auto packet = AudioPacket::Deserialize(data);
+			clientEndpoints[packet.clientId] = senderEndpoint; // Update the client's UDP endpoint
+			auto endpoints = roomManager.GetAudioEndpointsInRoom(packet.roomId, packet.clientId);
+			for (const auto& endpoint : endpoints)
+			{
+				udpServer.SendPacket(data, endpoint);
+			}
+			spdlog::info("Forwared audio packet from {} to {} clients in room {}", packet.clientId, endpoints.size(), packet.roomId);
+		}
+		catch (const std::exception& ex)
+		{
+			spdlog::error("UDP packet error: {}", ex.what());
+		}
 	}
 }
