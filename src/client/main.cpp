@@ -1,5 +1,6 @@
 #include "client.h"
 #include <spdlog/spdlog.h>
+#include <windows.h>
 
 int main()
 {
@@ -10,10 +11,41 @@ int main()
 		ChattingOn::Client client(ioContext, config);
 		client.Start();
 		client.JoinRoom("client1", "room1");
-		// Send a test audio packet
-		std::this_thread::sleep_for(std::chrono::seconds(1)); // Wait for connection to establish
-		client.SendTestAudioPacket("client1", "room1");
-		ioContext.run();
+
+		// Register PTT hotkey (Ctrl)
+		RegisterHotKey(NULL, 1, MOD_CONTROL, VK_CONTROL);
+
+		MSG msg;
+		bool ctrlPressed = false;
+
+		while (GetMessage(&msg, NULL, 0, 0))
+		{
+			if (msg.message == WM_HOTKEY)
+			{
+				// Check if Ctrl is pressed
+				bool isCtrlDown = (GetAsyncKeyState(VK_CONTROL) & 0x8000) != 0;
+
+				if (isCtrlDown && !ctrlPressed)
+				{
+					// Ctrl just pressed - start capturing
+					client.TogglePushToTalk(true);
+					ctrlPressed = true;
+					spdlog::info("Push to talk enabled");
+				}
+				else if (!isCtrlDown && ctrlPressed)
+				{
+					// Ctrl just released - stop capturing
+					client.TogglePushToTalk(false);
+					ctrlPressed = false;
+					spdlog::info("Push to talk disabled");
+				}
+			}
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+
+		UnregisterHotKey(NULL, 1);
+		client.Stop();
 	}
 	catch (const std::exception& ex)
 	{

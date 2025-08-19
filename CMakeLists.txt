@@ -23,6 +23,8 @@ add_library(common STATIC
 	src/common/network_utils.cpp
 	src/common/control_message.cpp
 	src/common/audio_packet.cpp
+	src/common/audio_handler.cpp
+	src/common/jitter_buffer.cpp
 	#### ADD MORE
 )
 

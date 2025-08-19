@@ -9,6 +9,7 @@ namespace ChattingOn
 	{
 		std::string clientId;
 		std::string roomId;
+		uint32_t sequenceNumber;
 		std::vector<char> audioData;
 
 		std::vector<char>Serialize() const;

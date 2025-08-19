@@ -8,6 +8,7 @@ namespace ChattingOn
 		nlohmann::json j;
 		j["clientId"] = clientId;
 		j["roomId"] = roomId;
+		j["sqeuenceNumber"] = sequenceNumber;
 		std::string header = j.dump(); // Serialize the json object to a string
 		std::vector<char> result(header.begin(), header.end()); // Using Vector we can mix text + binary data. Its resizable like char* array on C.
 		result.push_back('\0');
@@ -28,6 +29,7 @@ namespace ChattingOn
 		nlohmann::json j = nlohmann::json::parse(header);
 		packet.clientId = j["clientId"].get<std::string>();
 		packet.roomId = j["roomId"].get<std::string>();
+		packet.sequenceNumber = j["sequenceNumber"].get<uint32_t>();
 		packet.audioData = std::vector<char>(sep + 1, data.end());
 		return packet;
 	}
